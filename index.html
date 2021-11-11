@@ -1,0 +1,347 @@
+<HTML>
+<HEAD>
+<TITLE>TempNet</TITLE>
+<style type="text/css">
+
+p {
+	font-family: Verdana, Geneva, sans-serif;
+	font-size:1em;
+}
+
+p.eg {
+	background-color:#E9E9E9;
+	font-family:"Courier New", Courier, monospace;
+	font-size:1em;
+	margin-left:20px;
+	margin-right:20px;
+	padding: 4px;
+}
+
+p.eg:first-line {
+	color:#7C3CBB;
+}
+
+p.hancock {
+	margin-left:40px;
+	clear: none;
+	float: left;
+	text-align: left;
+	word-spacing: normal;
+	margin-top: 0px;
+	margin-bottom: 0px;
+	padding-top: 5px;
+	padding-bottom: 5px;
+}
+
+li {
+	font-family: Verdana, Geneva, sans-serif;
+	font-size:0.85em;
+}
+
+th {
+	font-family: Verdana, Geneva, sans-serif;
+	font-size:0.85em;
+	margin-top:10px;
+	text-align:center;
+	background-color:#CCCCFF;
+}
+
+h1 {
+	font-family: Verdana, Geneva, sans-serif;
+	font-size:26px;
+	background-color:#D6D6F5;
+	margin-top:20px;
+	padding-left:6px;
+	padding-top: 2px;
+	padding-right: 2px;
+	padding-bottom: 2px;
+}
+
+h2 {
+	font-family: Verdana, Geneva, sans-serif;
+	font-size:20px;
+}
+
+
+div#header {
+	background-image:  url(Logo.jpg);
+	background-repeat: no-repeat;
+	height: 150px;
+	text-align: right;
+	font-family:"Arial",sans-serif;
+	font-size:16px;
+	background-color: #0000F0;
+	width: 640px;
+}
+div#back {
+	text-align: right;
+	position:relative;
+	top:-50px;
+	right:10px;
+	margin-bottom:-40px;
+	font-family: Verdana, Geneva, sans-serif;
+}
+
+div#credit {
+	height: 70px;
+	width: 600px;
+	clear: both;
+	margin-bottom: 18px;
+}
+
+img {
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+	float: none;
+}
+img.uni {
+	float:right;
+	clear: none;
+	height: 70px;
+}
+
+a.nav {
+	margin-right: 20px;
+	font-size:1em;
+	line-height:150%;
+	color:#D6D6F5;
+	text-decoration:none;
+}
+
+a:hover.nav {text-decoration:underline; font-style:italic;}
+
+a:hover {text-decoration:underline; font-style:italic;}
+
+</style>
+
+</HEAD>
+<BODY id="top">
+<TABLE align="center" WIDTH=640 BORDER=0><TR><TD>
+<div id="header">Stefan Prost and Christian N. K. Anderson<BR>
+<BR>
+<a class="nav" href="#Inst">Installation</a><BR>
+<a class="nav" href="#Cmd">Arguments</a><BR>
+<a class="nav" href="#Val">Return Values</a><BR>
+<a class="nav" href="#Eg">Examples</a>
+</div>
+<P>An R-script for summarizing heterochronous genetic data.
+<P>Last updated: October 6, 2014
+<H1>Overview</H1><div id="back">&nbsp;</div>
+<P>The use of heterochronous data to study demographic changes in epidemiology and ancient DNA studies has revolutionized our understanding of complex evolutionary processes such as invasions, migrations, and responses to drugs or climate change. While there are sophisticated applications based on Markov Chain Monte Carlo (MCMC) or Approximate Bayesian Computation (ABC) to study these processes through time, summarizing the raw genetic data in an intuitively meaningful graphic can be challenging, most notably if identical haplotypes are present at different points in time.</P>
+
+<H2>Alternative 1: Trees</H2>
+<P>Perhaps the most enduring icon of all biology is the phylogenetic tree. Darwin drew the first known example 17 years before publishing <I>The Origin of Species</I>, a book whose only figure was a phylogenetic tree. However, these powerful visual tools do not always convey the maximal amount of information. Consider the following. When two sequences are identical, they are usually depicted as sharing a node without branches. In the figure below, Samples 1 and 2 are identical.</P>
+<img src="egtree1.gif">
+<P>Similarly, when two sequences are from different time periods, then branch lengths are shortened appropriately so that the tips do not align (i.e., the tree is non-ultrametric). In the example below, Sample3 is chronologically older than the other two samples.</P>
+<img src="egtree2.gif">
+<P>However, when two sequences are identical <i>and</i> come from different time periods, then the researcher faces something of a conundrum. Does she ignore the heterochrony and draw the tree as in the first example, or does she ignore the shared sequence and emphasize the heterochrony as below? (In this example, sequence 1 is older than sequence 2, but the base pairs are identical)</P>
+<img src="egtree3.gif">
+<P>The value of phylogenetic trees is not in question; however, we suggest that in this specific case neither alternative is entirely satisfactory. This problem also arises where there are large numbers of shared or related haplotypes from many different time points. The inter-mixing of samples, though usually representable, does not always clearly demonstrate the point the scientist wishes to convey.</P>
+
+<H2>Alternative 2: Haplotype networks</H2>
+<P>The familiar haplotype network is a two-dimensional, intuitively appealing summary of genetic diversity within a single group, in which the size of each node (circle) represents the frequency of a haplotype, and in which the length of (or number of tick-marks on) the links represents the amount of genetic divergence. In the example below, the number of samples in each haplogroup is indicated.</P>
+<img src="egnet1.gif">
+<P>To display information from more than one group, researchers must resort to replacing the nodes of the haplotype network with pie-charts. In the example below, samples from one time period are in dark blue, and samples from another are in light blue. The largest haplogroup contains representatives from both time periods.</P>
+<img src="egnet2.gif">
+<P>Again, the resulting figure can be quite attractive and useful, but sometimes can be difficult to interpret, because it requires the viewer to compare areas of irregularly shaped objects from several different locations. Pie charts themselves are among the most difficult figures for making comparisons between closely related groups; as one prominent graphic designer has said, "The only worse design than a pie chart is several of them." (Tufte 2001, p178). Though this opinion may be unnecessarily harsh, we believe it is possible to improve this figure.</P>
+
+<H2>Temporal Networks</H2>
+<P>A more elegant and accessible way to explore temporal coherence is through the use of networks stacked in three dimensions. Compare the example below to the second haplotype network above.</P>
+<img src="egtempnet.gif">
+<P>The first example of such a design was recently published in Prost et al. 2010. In this paper, two-dimensional networks were constructed using TCS software (Clement, Posada & Crandall 2000) and subsequently combined into a three-dimensional structure by hand using standard graphical tools. However, constructing three-dimensional networks by hand is both difficult and time-consuming. Here we present an R script to automatically produce three-dimensional statistical parsimony networks, substantially alleviating both problems. </P>
+
+<a name="Inst"><H1>Installation Instructions</H1></a>
+<div id="back"><a href="#top">top</a></div>
+<P>TempNet() is a script that runs in the R mathematical environment. If you don't already have it, you should download R from <a href="http://cran.r-project.org/">The Comprehensive R Archive Network</A>. Then follow the instructions below.</P>
+<OL><LI>Download the <a href="tempnet.r">TempNet script</a> and save it somewhere easily accessible on your hard drive.</LI>
+<LI>Open R, then load the TempNet script. You can do this either of two ways: (1) open TempNet.r in a text editor, then copy-and-paste the entire contents into the R command window, or (2) type <font face="courier">source("[pathoffile]/tempnet.r")</font> in the R command window.<BR>
+<img src="sourceshot.jpg"></LI>
+<LI>If necessary, install the following libraries from Cran: ape and pegas. This is done through the "Packages" menu in the R-GUI interface on Windows, Mac and LINUX platforms (see below).<BR><img src="libshot.jpg"></LI>
+<LI>Create a temporal network by typing <font face="courier">TempNet("[pathofsequencefile]")</font> in the R command window. Sequence files can be in any of the usual formats (FASTA, clustal, interleaved, etc), though the program will assume FASTA format by default. You can customize your network in many different ways (see <a href="#Cmd">Arguments</a> section). If you do not have any sequence files, you can download some from the <a href="#Eg">Examples</a> section below.</LI></OL>
+
+<H2>Arranging the Network</H2>
+<P>Once you have loaded the temporal network, you can interact with it dynamically. This point-and-click interface allows you to rapidly arrange your haplogroups into a professional-quality figure. There are three general areas where you can click on the network.</P>
+<LI>The background "white space" (i.e., anywhere outside the haplogroup circles). Clicking here will exit you from the program loop and return statistics about your network.<BR><img src="whitesp.gif"></LI>
+<LI>The beginning of the layer label. Clicking here allows you to move the text which identifies each layer. Click a second time to relocate the label.<BR>
+<table><tr><th>First Click</th><th>Second click</th></tr><tr><td><img src="label1.gif"></td><td><img src="label2.gif"></td></tr></table></LI>
+<LI>A haplogroup on <b>the bottom layer only</b>. Moving a haplogroup on the bottom layer will move it on all layers. Once you have selected a haplogroup, you again have three options.
+  <OL><LI><B>White space:</B> This will simply move the haplogroup to the indicated location.<br>
+  <table><tr><th>First Click</th><th>Second click</th></tr><tr><td><img src="movehap1.gif"></td><td><img src="movehap2.gif"></td></tr></table></LI>
+  <LI><B>Another haplogroup with a shared neighbor:</B> The haplogroups--and all attached groups--will swap places and automatically rotate them.<BR>
+  <table><tr><th>First Click</th><td><img src="swaphap1.gif"></td></tr>
+  <th>Second click</th><td><img src="swaphap2.gif"></td></tr>
+  <th>Result</th><td><img src="swaphap3.gif"></td></tr>
+  </table></LI>
+  <LI><B>The same haplogroup a second time:</B> This will highlight all the haplogroups on the branch. Click anywhere on the graph a third time, and TempNet() will translate the entire branch to the new location.</LI>
+  <table><tr><th>Click twice</th><td><img src="movebr1.gif"></td></tr>
+  <th>Third click</th><td><img src="movebr2.gif"></td></tr>
+  <th>Result</th><td><img src="movebr3.gif"></td></tr>
+  </table></LI></OL>
+</LI></OL>
+<P>The drawing window automatically rescales itself if you extend haplogroups beyond the limits of the original plane. If you need considerably more room, then re-center the haplogroup at the edge of the figure repeatedly in order to gradually expand the figure limits. You can then save your figure in many formats through the R menu. The pdf format is particularly good for journal figures because it is vector-based, meaning it can be printed at any arbitrarily high resolution. </P>
+
+
+<a name="Cmd"><H1>Arguments</H1></a><div id="back"><a href="#top">top</a></div>
+<P>While we have attempted to make it as simple as possible to create a temporal network, we have also included many ways for you to customize your own network. Below is a description of the many modifications you can make to the default settings. In all cases, the command invoking these modifications is contained within the parentheses of <font face="courier">TempNet("[file]",arg1=?,arg2=?,...)</font> and followed by an equals sign. In the parlance of computer science, these are "arguments" that are passed to the TempNet() "function". Examples are given in <font face="courier"><background color="#5555FF">boxes</background></font> following each explanation.</P>
+
+<H2>ftype</H2>
+<P>This command specifies the format of the sequence file. Possible values are</P>
+<UL>
+	<LI>"fasta" (the default if none is specified)</LI>
+	<LI>"interleaved"</LI>
+	<LI>"sequential" or</LI>
+	<LI>"clustal"</LI>
+</UL>
+<P>Any unambigious abbreviation of these will also work. </P>
+<P class="eg">TempNet("example.clust",ftype="clustal")<BR>This opens a clustal-formatted file. Attempting to open this file without specifying which format it is in will only succeed if the file is in fasta format.</P>
+
+<H2>ages</H2>
+<P>There are two ways to assign sequences to different layers. The first way is to append a suffix to the end of each sequence name in the sequence file. This suffix consists of the dollars sign and the number of the layer it is assigned to (e.g., >Seq1$1). The other way to do this is by passing TempNet a vector of the same length as the number of sequences, where each element in the vector assigns that sequence to a layer. The ages argument will override the layer assignment from the file.</P>
+<P class="eg">TempNet("example.fas",ages=c(1,1,1,2,2,1,3,3))<br>
+The first three sequences and the sixth will be on the bottom layer, sequences 4 and 5 will be in layer two, and the last two will be on layer 3, no matter which layer the file says they should be on.</P>
+
+<H2>mut_size</H2>
+<p>How large to draw the circles on links indicating "more than one mutation". By default, they are drawn 1.5 times larger than a normal dot in R.</p>
+<P class="eg">TempNet("example.fas",mut_size=3)<BR>
+Make the mutation dots 3x larger than a normal data point, which is also twice as large as the TempNet() default.</P>
+<table align="center"><tr><th>Default</th><th>mut_size=3</th></tr>
+<tr><td><img src="defaultnet.gif"></td><td><img src="mut_size.gif"></td></tr></table>
+
+<H2>nohap_size</H2>
+<p>How large to draw the circles indicating the absence of a haplogroup from the current layer. By default, such "empty" groups are drawn to have an area half the size of a haplogroup containing just one representative.</p>
+<P class="eg">TempNet("example.fas",nohap_size=.25)<BR>
+Empty haplogroups have 1/4th the area of a haplogroups with 1 member.</P>
+<table align="center"><tr><th>Default</th><th>nohap_size=.25</th></tr>
+<tr><td><img src="defaultnet.gif"></td><td><img src="nohap_size.gif"></td></tr></table>
+
+<H2>layernm</H2>
+<P>The names assigned to each layer. By default these are "Layer 1", "Layer 2", etc. In order to have no labels at all, use the vector c("","",...).</P>
+<P class="eg">TempNet("example.fas",layernm=c("2kya","Now"))<br>
+Give the network layers different names.</P>
+<table align="center"><tr><th>Default</th><th>layernm=c("2kya","Now"))</th></tr>
+<tr><td><img src="defaultnet.gif"></td><td><img src="layernm.gif"></td></tr></table>
+
+
+<H2>invert</H2>
+<P>If "true", then draw the network upside-down. It's a handy way to create / reverse stratigraphic order.</P>
+<P class="eg">TempNet("example.fas",invert=T)<BR>
+Reverses the layer order.</P>
+<table align="center"><tr><th>Default</th><th>invert=T</th></tr>
+<tr><td><img src="defaultnet.gif"></td><td><img src="invert.gif"></td></tr></table>
+
+<H2>mut.len</H2>
+<P>The factor by which to scale each mutation, changing the length of the segments joining haplogroups. Particularly useful for networks containing many haplogroups that share a neighbor. Default=1.</P>
+<P class="eg">TempNet("example.fas",mut.len=2)<BR>
+Changes the relative distance separating the haplogroups.</P>
+<table align="center"><tr><th>Default</th><th>mut.len=2</th></tr>
+<tr><td><img src="mutlen1.gif"></td><td><img src="mutlen2.gif"></td></tr></table>
+
+<H2>planes</H2>
+<P>Should semi-transparent gray rectangles, indicating the perspective of the network, be drawn for each layer? By default, they do not appear.</P>
+<P class="eg">TempNet("example.fas",planes=T)<BR>
+Draws the "planes" on which the network rests.</P>
+<table align="center"><tr><th>Default</th><th>planes=T</th></tr>
+<tr><td><img src="defaultnet.gif"></td><td><img src="planes.gif"></td></tr></table>
+
+<H2>confirm</H2>
+<P>Ordinarily, you signal you are finished arranging your network by clicking in the "white space" away from haplocircles, layer names, or just on one of the higher layers. By default, the program will ask you if you meant to signal you were finished, or if the click was a mistake. If you set this argument to false, then it will not ask this question. NOTE: due to conflicts in the old version of the tcltk library, some users may need to set this argument to false in order to run the program.</P>
+<P class="eg">TempNet("example.fas",confirm=F)<BR>
+You have no option for repentance. If you accidently click outside one of the haplogroups, it's all over.</P>
+
+
+
+<H2>color</H2>
+<P>A vector giving the color for each layer. By default, the bottom layer is red, and subsequent layers are evenly and maximally different on the color wheel. In R, you can either specify colors by name (type <font face="courier">colors()</font> for a list of 600+), by hexcode, or by using the <font face="courier">rgb()</font> command. This last command takes three arguments, representing how intense the red, green and blue lights in each pixel should shine on a scale from 0 (not at all) to 1 (completely bright). An optional fourth argument specifies how opaque to make the color from 0 (completely transparent) to 1 (completely obscuring anything underneath). Use <font face="courier">rgb(0,0,0)</font> to make black, <font face="courier">rgb(1,1,1)</font> to make white.</P>
+<P class="eg">TempNet("example.fas",color=c("plum","ivory3"))<BR>
+Rather than that garish red and cyan, instead use a tasteful winter palette to impress your fashon-conscious journal editor.</P>
+<table align="center"><tr><th>Default</th><th>color=c("plum","ivory3")</th></tr>
+<tr><td><img src="defaultnet.gif"></td><td><img src="color.gif"></td></tr></table>
+
+<H2>theta/phi (3d options)</H2>
+<P>Use these two arguments to control the altitude and direction (respectively) from which you view the network. The angle is given in radians not degrees. By default, the network is viewed from theta=0, phi=pi/6.</P>
+<P class="eg">TempNet("example.fas",theta=pi/6,phi=pi/9)<BR>
+View the network from a different angle. You can also use planes=T to more easily keep track of where you are standing relative to the default head-on view.</P>
+<table align="center"><tr><th>Default</th><th>theta and phi</th></tr>
+<tr><td><img src="defaultnet.gif"></td><td><img src="thetaphi.gif"></td></tr></table>
+
+<H2>hapid</H2>
+<P>By default, the number on each circle represents the numbers of individual sequences belonging to that circle. This is also represented by the area of the circle. If, instead, you wish to have each haplogroup be assigned a number, and have that printed on the circles instead, then you may do this by making turning on the hapid option.</P>
+<P class="eg">TempNet("example.fas",hapid=T)<BR>
+While the circle area still represents the number of sequences in each haplogroup, the number in the middle of those circles identifies the group, not the number of individuals belonging to that group.</P>
+<table align="center"><tr><th>Default</th><th>hapid=T</th></tr>
+<tr><td><img src="defaultnet.gif"></td><td><img src="hapid.gif"></td></tr></table>
+
+<H2>mergelayer</H2>
+<P>If you wish to overlay different network layers, you can do this by merging them. The haplogroups in the layers will be different colors. However, this option only works if the layers have no shared haplogroups. Provided this criterion is met, you can merge as many layers as you want.</P>
+<P class="eg">TempNet("bigexample.fas",mergelayer=list(c(1,3),c(2,4))<BR>
+Here, you have samples from two populations at two different points in time. You can emphasize the difference between populations by combining layers 1+3, and layers 2+4. Note that each merged layer has two different colors, representing the two populations.
+</P>
+<table align="center"><tr><th>Default</th></tr>
+<tr><td><img src="merge1.gif"></td></tr><tr><th>mergelayer=list(c(1,3),c(2,4))</th></tr>
+<tr><td><img src="merge2.gif"></td></tr></table>
+
+<P>Here is a different example from a paper, showing the happens if haplogroups are present in multiple merged layers: the groups are displayed as pie-graphs. Here, the colors represent different locations, and the layers two different time slices.</P>
+<table align="center"><tr><th>Cave Cheetah example</th></tr>
+<tr><td><img src="pie.gif"></td></tr></table>
+
+<a name="Val"><H1>Return Values</H1></a><div id="back"><a href="#top">top</a></div>
+<P>In addition to the graphics, the script returns an R list object with three items.</P>
+<H2>1. Group Assignment</H2>
+<P>Each sequence is listed by name in the order in which it appears in the input file. Below the name is the id number of the group it was belongs to. The first return value from the TempNet used in all the examples above would look like this: </P>
+
+<P class="eg">[[1]]<BR>
+SeqA$1&nbsp;SeqB$1&nbsp;SeqC$1&nbsp;SeqD$1&nbsp;SeqE$2&nbsp;SeqF$2&nbsp;SeqG$2&nbsp;SeqH$1<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2<BR>
+SeqI$1&nbsp;SeqJ$1&nbsp;SeqK$1&nbsp;SeqL$1&nbsp;SeqM$1&nbsp;SeqN$2&nbsp;SeqO$1<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4</P></P>
+
+<H2>2. Group Counts</H2>
+<P>The second return value is a matrix where each row represents a haplogroup (in order by the id number given in the first return value) and each column represents a layer in the network. Again, using the examples above, the second return value would look like this:
+<P class="eg">[[2]]<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[,1]&nbsp;[,2]<BR>
+[1,]&nbsp;&nbsp;&nbsp;&nbsp;4&nbsp;&nbsp;&nbsp;&nbsp;3<BR>
+[2,]&nbsp;&nbsp;&nbsp;&nbsp;5&nbsp;&nbsp;&nbsp;&nbsp;0<BR>
+[3,]&nbsp;&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;&nbsp;&nbsp;0<BR>
+[4,]&nbsp;&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;&nbsp;&nbsp;1</P>
+
+<H2>3. Link Confidence</H2>
+<P>The final return value is the statistical probability of each link in the network being evolutionarily correct (that is, all members of group A and group B diverged from each other and not through a third haplogroup in the network). The probabilities are derived from Templeton, Crandall and Singh's 1992 work on statistical parsimony networks, and represent the probability for a one-layer network, rather than being re-derived for each layer sequentially. Each row of the matrix represents one link in the network. The first two columns tell which haplogroup id are joined by the link, the third &quot;step&quot; column tells how many segregating sites lie between the two groups, and the last &quot;Prob&quot; column gives the probability of that parsimonious link being correct.</P>
+<P class="eg">[[3]]<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;step&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Prob<BR>
+[1,]&nbsp;2&nbsp;1&nbsp;&nbsp;&nbsp;&nbsp;1&nbsp;0.9701357<BR>
+[2,]&nbsp;3&nbsp;2&nbsp;&nbsp;&nbsp;&nbsp;2&nbsp;0.9117092<BR>
+[3,]&nbsp;4&nbsp;2&nbsp;&nbsp;&nbsp;&nbsp;3&nbsp;0.8286213</P>
+
+<a name="Eg"><H1>Examples</H1></a><div id="back"><a href="#top">top</a></div>
+<P>Here are a few sample data files. The first one, <a href="fake.fas">fake.fas</a>, was used to make the examples with the arguments above. The following figure was produced with the command <font face="courier">TempNet("fake.fas",color=c("purple","yellow"),planes=T)</font>. It contains unrealistically short sequences and small samples, and should be used merely for the purposes of illustration.</P>
+<img src="fake.gif">
+<P>The next file, <a href="eg.fasta">eg.fasta</a> is modified slightly from actual sequence data in a real (though as-yet-unpublished) study. Alignments are 615 base pairs long, contain a realistic mix of nucleotides, and come from three different time periods. The command <font face="courier">TempNet("eg.fasta", layernm=c("Present","2,000ya","4,000ya"), invert=T)</font> produces the following.</P>
+<img src="egfasta.gif">
+<P>The following is an example of a large and complex dataset. The sequences represented below come from Puerto Rican dengue fever virus sampled at several different times, and demonstrates the rapid rate of viral evolution. The data are from <a href="http://dx.doi.org/10.1093/molbev/msg182">Bennett et al.</a>'s excellent 2003 paper in MBE.</P>
+<img src="dengue.gif">
+
+<a name="Conc"><H1>Conclusion</H1></a><div id="back"><a href="#top">top</a></div>
+<P>Temporal networks are an attractive way to display and summarize relationships within the heterochronous data so commonly found in ancient DNA or epidemiological research. Complex evolutionary changes can be easily seen in the temporal network. These graphics may also be used to illustrate the differences between contemporaneous populations (for spatial sampled data, etc.) using a space-as-time approach.</P>
+<P>We hope this script helps you understand your data and display it in an attractive way. For comments, requests for extensions, or troubleshooting, contact the authors at the addresses below.</P><P>Thank you, and good luck.</P>
+
+<div id="credit">
+<P class="hancock"><a href="mailto:stefan.prost@anatomy.otago.ac.nz">Stefan Prost</a><BR>University of Otago and <BR> UC Berkeley</P>
+<img class="uni" src="awc.gif"><img class="uni" src="ucberk.gif"><img class="uni" src="uotago.gif"></div>
+
+<div id="credit">
+<P class="hancock">
+<a href="mailto:weird.attractor@gmail.com">Christian Anderson</a><BR>
+Harvard University and<BR>Scripps Institution of Oceanography</P>
+<img class="uni" src="sio.gif">
+<img class="uni" src="harvard.gif">
+</div>
+
+</TD></TR>
+<TR><TD>
+<P>The authors thank Elizabeth Hadly for the use of her lab webspace to host the program. This work was supported in part by the Allan Wilson Centre for Molecular Ecology and Evolution, and NSF grant DEB-0743616 to Scott V. Edwards and Dennis Pearl.<br><br></P>
+
+</TD></TR>
+</TABLE>
+</BODY>
+</HTML>
